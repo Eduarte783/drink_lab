@@ -1,6 +1,6 @@
 # Drink-Lab
 
-View a slew of cocktail drinks and recipe's and make a list of your favorites. Comment and suggest on your favorite drinks. 
+View a slew of cocktail drinks and recipies and make a list of your favorites. Comment and suggest on your favorite drinks. 
 
 ***
 
@@ -14,7 +14,6 @@ Look through a variety of mixed drinks and make a list of your favorite ones.
 
 ## WIREFRAME
 
-image.png
-image.png
-image.png
-       
+![First](./img/LoginPage_wireframe.png)
+![Home](./img/HomePage_wireframe.png) 
+![Fave](./img/FavesPage_wireframe.png)   
