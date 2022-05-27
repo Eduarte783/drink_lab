@@ -22,7 +22,7 @@ Look through a variety of mixed drinks and make a list of your favorite ones.
 
 ## ERD 
 
-![Diagram](./img/DrinkLab_ERD.png)
+![Diagram](./img/DrinkLabERD.png)
 
 ## RESTFul Routes
 
