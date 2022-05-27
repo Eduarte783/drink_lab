@@ -26,7 +26,7 @@ Look through a variety of mixed drinks and make a list of your favorite ones.
 
 ## RESTFul Routes
 
-![RESTFul](./img/RESTful_routes.png)
+![RESTFul](./img/RESTful_routes1.png)
 
 ### Goals
 
