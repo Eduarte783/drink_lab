@@ -5,6 +5,7 @@ const rowdy = require('rowdy-logger')
 const cookieParser = require('cookie-parser')
 const db = require('./models')
 const cryptoJS = require('crypto-js')
+const axios = require('axios')
 
 // app config
 const PORT = process.env.PORT || 3000
