@@ -1,3 +1,4 @@
+/*
 const bcrypt = require('bcryptjs')
 const cryptoJS = require('crypto-js')
 
@@ -29,4 +30,4 @@ const testCrypto = () => {
 	const decrypted = cryptoJS.AES.decrypt(encrypted, passphrase).toString(cryptoJS.enc.Utf8)
 	console.log(decrypted)
 }
-testCrypto()
+testCrypto() */

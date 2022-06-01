@@ -6,9 +6,11 @@ const cookieParser = require('cookie-parser')
 const db = require('./models')
 const cryptoJS = require('crypto-js')
 const axios = require('axios')
+const ejsLayouts = require('express-ejs-layouts')
+const methodOverride = require('method-override')
 
 // app config
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3300
 const app = express()
 app.set('view engine', 'ejs')
 
@@ -17,6 +19,16 @@ const rowdyRes = rowdy.begin(app)
 app.use(require('express-ejs-layouts'))
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
+
+app.get('/', (req, res) => {
+  let drinksUrl = 'http://www.thecocktaildb.com/api/json/v1/1/random.php';
+    axios.get(drinksUrl).then(response => {
+    let drinks = response.data.results;
+    res.render('index.ejs', { drinks: response.data.Search })
+  })
+  .catch(console.log)
+});
+
 
 // DIY middleware
 // happens on every request
@@ -60,6 +72,10 @@ app.get('/', (req, res) => {
 
 // controllers
 app.use('/users', require('./controllers/users'))
+/*
+app.use('/drink', require('./controllers/drink'))
+app.use('/fave', require('./controllers/fave'))
+*/
 
 app.listen(PORT, () => {
   console.log(`server is running on port ${PORT}`);

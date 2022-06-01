@@ -1,6 +1,6 @@
 {
   "development": {
-    "database": "drink_lab_development",
+    "database": "drink-lab-development",
     "host": "127.0.0.1",
     "dialect": "postgres"
   }
