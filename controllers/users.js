@@ -10,7 +10,7 @@ router.get('/new', (req, res) => {
 })
 
 // POST /users -- creates a new user and redirects to index
-router.post('/', async (req, res) => {
+router.post('/new', async (req, res, next) => {
 	try {
 		// try to create the user
 		// hash password
@@ -25,15 +25,17 @@ router.post('/', async (req, res) => {
 			// login them in by giving them cookie
 			// res.cookie('cookie name', cookie data)
 			// encrypt id
-			const encryptedId = cryptoJS.AES.encrypt(user.id.toString(), process.env.ENC_KEY).toString()
+			const encryptedId = cryptoJS.AES.encrypt
+			(user.id.toString(), 
+			process.env.ENC_KEY).toString()
 			res.cookie('userId', encryptedId)
 			// redirect to the homepage (in the future this could redirect elsewhere)
-			res.redirect('/users/profile')
+			res.redirect('/profile')
 		} else {
 		// if the user was not created
 			// re render the login form with a message for the user
 			console.log('that email already exists')
-			res.render('users/new.ejs', { msg: 'email exists in database already 🤦‍♂️' })
+			res.render('users/new.ejs', { msg: 'User exists already, please log in with your email and password', })
 		}
 	} catch (err) {
 		console.log(err)
@@ -49,26 +51,26 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => {
 	try {
 		// look up the user in the db based on their email
-		const foundUser = await db.user.findOne({
+		const user = await db.user.findOne({
 			where: { email: req.body.email }
 		})
 		const msg = 'bad login credentials, you are not authenticated!'
 		// if the user is not found -- display the login form and 
-		if (!foundUser) {
+		if (!user) {
 			console.log('email not found on login')
-			res.render('users/login.ejs', { msg })
+			res.render('users/login.ejs', { msg: msg })
 			return // do not continue with the function
 		}
 
 		// otherwise, check the provided password against the password in the database
 		// hash the password from the req.body and compare it to the db password
-		const compare = bcrypt.compareSync(req.body.password, foundUser.password)
+		const compare = bcrypt.compareSync(req.body.password, user.password)
 		if (compare) {
 			// if they match -- send the user a cookie! to log them in
-			const encryptedId = cryptoJS.AES.encrypt(foundUser.id.toString(), process.env.ENC_KEY).toString()
+			const encryptedId = cryptoJS.AES.encrypt(user.id.toString(), process.env.ENC_KEY).toString()
 			res.cookie('userId', encryptedId)
 			// redirect to profile
-			res.redirect('/users/profile') 
+			res.redirect('users/profile') 
 		} else {
 			// if not -- render the login form with a message
 			res.render('users/login.ejs', { msg })
@@ -85,17 +87,6 @@ router.get('/logout', (req, res) => {
 	res.clearCookie('userId')
 	// redirect to root
 	res.redirect('/')
-})
-
-router.get('/profile', (req, res) => {
-	// check if user is authorized
-	if (!res.locals.user) {
-		// if the user is not authorized, ask them to log in
-		res.render('users/login.ejs', { msg: 'please log in to continue' })
-		return // end the route here
-	}
-
-	res.render('users/profile', { user: res.locals.user })
 })
 
 module.exports = router

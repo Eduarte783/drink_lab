@@ -2,15 +2,17 @@ require('dotenv').config()
 // required packages
 const express = require('express')
 const rowdy = require('rowdy-logger')
+const ejsLayouts = require('express-ejs-layouts');
 const cookieParser = require('cookie-parser')
 const db = require('./models')
 const cryptoJS = require('crypto-js')
+const bcrypt = require('bcryptjs')
 const axios = require('axios')
-const ejsLayouts = require('express-ejs-layouts')
 const methodOverride = require('method-override')
 
+
 // app config
-const PORT = process.env.PORT || 3300
+const PORT = process.env.PORT || 3000
 const app = express()
 app.set('view engine', 'ejs')
 
@@ -22,9 +24,9 @@ app.use(cookieParser())
 
 app.get('/', (req, res) => {
   let drinksUrl = 'http://www.thecocktaildb.com/api/json/v1/1/random.php';
-    axios.get(drinksUrl).then(response => {
-    let drinks = response.data.results;
-    res.render('index.ejs', { drinks: response.data.Search })
+    axios.get(drinksUrl).then(apiResponse => {
+    let drink = apiResponse.data.results;
+    res.render('index', { drink: apiResponse.data.drinks })
   })
   .catch(console.log)
 });
@@ -58,24 +60,43 @@ app.use(async (req, res, next) => {
       // the user is explicitly not logged in
       res.locals.user = null
     }
-    next()
+   
   } catch (err) {
-    console.log(err)
+    console.log(err);
+  } finally {
+    next()
   }
 })
 
-// routes
+// Homepage route
 app.get('/', (req, res) => {
   // console.log(res.locals)
-  res.render('index')
+  res.render('index.ejs', { msg: null })
 })
 
 // controllers
 app.use('/users', require('./controllers/users'))
-/*
 app.use('/drink', require('./controllers/drink'))
-app.use('/fave', require('./controllers/fave'))
-*/
+app.use('/profile', require('./controllers/profile'))
+
+
+// 404 error handler LAST
+// app.get('/*', (req, res)=>{
+//   // render your 404 here
+// })
+app.use((req, res, next)=>{
+  // render a 404 template
+  res.status(404).render('404.ejs')
+})
+
+// 500 error
+// needs to have all 4 params
+app.use((error, req, res, next)=>{
+  // log the error
+  console.log(error)
+  // send a 500 error template
+  res.status(500).render('500.ejs')
+})
 
 app.listen(PORT, () => {
   console.log(`server is running on port ${PORT}`);
