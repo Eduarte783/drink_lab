@@ -1,11 +1,31 @@
-<h2>User Profile</h2>
+<div class="container">
+  <h1 class="text-center">Welcome to Drink Lab!</h1>
+  <h3>Thanks for being a user, <%= user.email %>! </h3>
+  <p class="text-center">
+    <a href="/faves/favorites">Lip Schhmackin' Faves</a>
+  </p>
 
-<h3>Thanks for being a user, <%= user.email %>! </h3>
+  <% drink.forEach(drinks => { %>
+    <div 
+      <h2><%= drinks.strDrink %></h2>
+      <p><%= drinks.strCategory %></p>
+      <img src="<%= drinks.strDrinkThumb %>"  height=250 width=250 alt="Drink Picture"
+      <form method="POST" action="/drink">
+        <input hidden type="text" name="name" value="<%= drinks.strDrink %>">
+        <button class="btn btn-primary" type="submit">Add to Favorite </button>
+      </form>
+    </div>
+  <% }); %>
+</div>
+
+
+
+<!--<h2>User Profile</h2>
+
+
 
 <ul>
-    <% allDrink.forEach(allFaves => { %>
-    <li><%= allFaves.drink %></li>
-    <%})%>
+    
   </ul>
   <form action="/users/profile" method="POST">
     <input type="text" name="comment" />
@@ -14,4 +34,4 @@
   
   <ul>
     <li></li>
-  </ul>
+  </ul> --!>

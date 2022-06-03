@@ -1,16 +1,17 @@
-<div class="container">
-  <h1 class="text-center">Welcome to Drink Lab!</h1>
-  <p class="text-center">
-    <a href="/faves">Lip Schhmackin' Faves</a>
-  </p>
 
-  <% drink.forEach(function(pokemon) { %>
-    <div 
-      <h2><%= pokemon.name %></h2>
-      <form method="POST" action="/pokemon">
-        <input hidden type="text" name="name" value="<%= pokemon.name %>">
-        <button class="btn btn-primary" type="submit">Add to Favorite Pokemon</button>
-      </form>
-    </div>
-  <% }); %>
-</div>
+
+<h1>Drink Lab</h1>
+  <nav>
+
+        <form action="/users/login" method="POST">
+	        <label for="email">Email:</label>
+	        <input id="email" type="email" name="email" placeholder="enter your email..." required />
+
+	        <label for="password">Password:</label>
+	        <input id="password" type="password" name="password" placeholder="enter your password " required />
+
+	      <button type="submit">Login!</button>
+        </form>
+  </nav>
+      <h3>Dont have an account?<p class="text-center"><a href="/users/new">Sign up!</a>
+      </p></h3>

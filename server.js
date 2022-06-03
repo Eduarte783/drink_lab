@@ -1,11 +1,13 @@
 require('dotenv').config()
 // required packages
 const express = require('express')
+const { use } = require("express/lib/application");
 const rowdy = require('rowdy-logger')
 const ejsLayouts = require('express-ejs-layouts');
 const cookieParser = require('cookie-parser')
 const db = require('./models')
 const cryptoJS = require('crypto-js')
+const res = require("express/lib/response");
 const bcrypt = require('bcryptjs')
 const axios = require('axios')
 const methodOverride = require('method-override')
@@ -21,15 +23,7 @@ const rowdyRes = rowdy.begin(app)
 app.use(require('express-ejs-layouts'))
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
-
-app.get('/', (req, res) => {
-  let drinksUrl = 'http://www.thecocktaildb.com/api/json/v1/1/random.php';
-    axios.get(drinksUrl).then(apiResponse => {
-    let drink = apiResponse.data.results;
-    res.render('index', { drink: apiResponse.data.drinks })
-  })
-  .catch(console.log)
-});
+app.use(methodOverride("_method"))
 
 
 // DIY middleware
@@ -71,23 +65,23 @@ app.use(async (req, res, next) => {
 // Homepage route
 app.get('/', (req, res) => {
   // console.log(res.locals)
-  res.render('index.ejs', { msg: null })
+  res.render('index', { msg: null })
 })
 
 // controllers
 app.use('/users', require('./controllers/users'))
 app.use('/drink', require('./controllers/drink'))
-app.use('/profile', require('./controllers/profile'))
+app.use('/faves', require('./controllers/faves'))
 
 
 // 404 error handler LAST
 // app.get('/*', (req, res)=>{
 //   // render your 404 here
 // })
-app.use((req, res, next)=>{
+/*app.use((req, res, next)=>{
   // render a 404 template
   res.status(404).render('404.ejs')
-})
+})*/
 
 // 500 error
 // needs to have all 4 params

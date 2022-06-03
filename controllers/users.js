@@ -3,6 +3,7 @@ const router = express.Router()
 const db = require('../models')
 const cryptoJS = require('crypto-js')
 const bcrypt = require('bcryptjs')
+const cookieParser = require('cookie-parser')
 
 // GET /users/new -- renders a form to create a new user
 router.get('/new', (req, res) => {
@@ -10,7 +11,7 @@ router.get('/new', (req, res) => {
 })
 
 // POST /users -- creates a new user and redirects to index
-router.post('/new', async (req, res, next) => {
+router.post('/', async (req, res) => {
 	try {
 		// try to create the user
 		// hash password
@@ -30,12 +31,12 @@ router.post('/new', async (req, res, next) => {
 			process.env.ENC_KEY).toString()
 			res.cookie('userId', encryptedId)
 			// redirect to the homepage (in the future this could redirect elsewhere)
-			res.redirect('/profile')
+			res.redirect('/drink/results')
 		} else {
 		// if the user was not created
 			// re render the login form with a message for the user
 			console.log('that email already exists')
-			res.render('users/new.ejs', { msg: 'User exists already, please log in with your email and password', })
+			res.render('users/login.ejs', { msg: 'User exists already, please log in with your email and password' })
 		}
 	} catch (err) {
 		console.log(err)
@@ -51,29 +52,29 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => {
 	try {
 		// look up the user in the db based on their email
-		const user = await db.user.findOne({
+		const foundUser = await db.user.findOne({
 			where: { email: req.body.email }
 		})
 		const msg = 'bad login credentials, you are not authenticated!'
 		// if the user is not found -- display the login form and 
-		if (!user) {
-			console.log('email not found on login')
-			res.render('users/login.ejs', { msg: msg })
-			return // do not continue with the function
+		if (!foundUser) {
+			console.log('email not found on login');
+			res.render('users/login.ejs', {msg});
+			return; // do not continue with the function
 		}
 
 		// otherwise, check the provided password against the password in the database
 		// hash the password from the req.body and compare it to the db password
-		const compare = bcrypt.compareSync(req.body.password, user.password)
+		const compare = bcrypt.compareSync(req.body.password, foundUser.password);
 		if (compare) {
 			// if they match -- send the user a cookie! to log them in
-			const encryptedId = cryptoJS.AES.encrypt(user.id.toString(), process.env.ENC_KEY).toString()
+			const encryptedId = cryptoJS.AES.encrypt(foundUser.id.toString(), process.env.ENC_KEY).toString()
 			res.cookie('userId', encryptedId)
 			// redirect to profile
-			res.redirect('users/profile') 
+			res.redirect('/drink/results') 
 		} else {
 			// if not -- render the login form with a message
-			res.render('users/login.ejs', { msg })
+			res.render('users/login.ejs', { msg: 'are you sure you have an account' })
 		}
 
 	} catch (err) {
@@ -84,9 +85,20 @@ router.post('/login', async (req, res) => {
 // GET /users/logout -- clear the cookie to log the user out
 router.get('/logout', (req, res) => {
 	// clear the cookie from storage
-	res.clearCookie('userId')
+	res.clearCookie('userId');
 	// redirect to root
-	res.redirect('/')
+	res.redirect('/');
 })
+
+router.get('/drink', (req, res) => {
+	let drinksUrl = 'http://www.thecocktaildb.com/api/json/v1/1/random.php';
+	  axios.get(drinksUrl).then(apiResponse => {
+	  let drink = apiResponse.data.results;
+	  res.render('drink/results.ejs', { drink: apiResponse.data.drinks })
+	})
+	.catch(err) 
+	console.log(err)
+	
+  });
 
 module.exports = router

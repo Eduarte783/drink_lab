@@ -1,37 +1,68 @@
+// PROFILES PAGE //
+
 const express = require("express");
 const router = express.Router();
 const cryptoJS = require("crypto-js");
 const bcrypt = require("bcryptjs");
+const db = require("../models");
 
-// GET /drinks - return a page with favorited drinks
-router.get('/', (req, res) => {
-  const allFaves = db.drinks.findAll()
-  // TODO: Get all records from the DB and render to view
-  res.render('/drink/index', {allFaves}) 
-});
 
-// POST /pokemon - receive the name of a pokemon and add it to the database
-router.post('/', async (req, res) => {
-  await db.drink.create({
-    name: req.body.name
-  })
-  // TODO: Get form data and add a new record to DB
-  res.redirect('/drink')
-});
+// GET Profiles Page
+router.get('/drink', (req, res) => {
+	// check if user is authorized
+	if (!res.locals.user) {
+		// if the user is not authorized, ask them to log in
+		res.render('users/login', { msg: 'please log in to continue' })
+		return // end the route here
+	}
+  const user = res.locals.user;
+	res.render('users/profile', { user })
+})
 
-router.get('/:id', (req, res) => {
-  console.log(req.params.name)
-  axios.get(`http://www.thecocktaildb.com/api/json/v1/1/random.php'${req.params.name}`)
-    .then(response =>{
-      res.render('drink/show.ejs', {
-        name: response.data.strDrink,
-        stats: response.data.stats,
-        abilities: response.data.abilities,
-        moves: response.data.moves,
-        img_url: response.data.sprites.front_default 
-      })
-    })
+// GET // Create Edit page
+router.get("/edit", (req, res) => {
+	const user = res.locals.user;
+	res.render("drink/edit", { user, msg: null });
+  });
+  
+  // PUT // Edit Profile
+  router.put("/edit", async (req, res) => {
+	const user = res.locals.user;
+	const input = req.body;
+	try {
+	  const foundUser = await db.user.findOne({
+		where: { id: user.id },
+	  });
+  
+	  const matchedUsers = await db.user.findAll({
+		where: {
+		  [Op.or]: [{ email: input.email }, { username: input.username }],
+		  [Op.not]: [{ id: user.id }],
+		},
+	  });
+  
+	  if (matchedUsers.length === 0) {
+		const hashedPass = bcrypt.hashSync(input.password, salts);
+  
+		await foundUser.set({
+		  email: input.email,
+		  username: input.username,
+		  password: hashedPass,
+		});
+  
+		await foundUser.save();
+  
+		res.redirect("/drink");
+	  } else {
+		res.render("drink/edit", {
+		  msg: "Email or Username already belongs to another user, try again...",
+		});
+	  }
+	} catch (err) {
+	  console.warn(err);
+	}
+  });
+  
 
-  })
 
 module.exports = router;
