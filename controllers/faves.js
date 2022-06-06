@@ -16,6 +16,20 @@ router.get('/favorites', async (req, res) => {
 	// TODO: Get all records from the DB and render to view
 	res.render('faves/favorites.ejs', {allFaves}) 
   });
+
+  router.get('/:id', (req, res) => {
+	console.log(req.params.name)
+	axios.get(`http://www.thecocktaildb.com/api/json/v1/1/random.php'${req.params.name}`)
+	  .then(response =>{
+		res.render('faves/favorites.ejs', {
+		  name: response.data.strDrink,
+		  type: response.data.strCategory,
+		  instructions: response.data.strInstructions,
+		  img_url: response.data.strDrinkThumb, 
+		})
+	  })
+  
+	})
   
   // POST /Drink- receive the name of drink and add it to the database
   router.post('/favorites', async (req, res) => {
@@ -45,18 +59,6 @@ router.get('/favorites', async (req, res) => {
 	//res.redirect('/faves/favorites')
 
   
-  router.get('/:id', (req, res) => {
-	console.log(req.params.name)
-	axios.get(`http://www.thecocktaildb.com/api/json/v1/1/random.php'${req.params.name}`)
-	  .then(response =>{
-		res.render('faves/favorites.ejs', {
-		  name: response.data.strDrink,
-		  type: response.data.strCategory,
-		  instructions: response.data.strInstructions,
-		  img_url: response.data.strDrinkThumb, 
-		})
-	  })
-  
-	})
+
 
 module.exports = router
