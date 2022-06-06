@@ -5,19 +5,33 @@ const router = express.Router();
 const cryptoJS = require("crypto-js");
 const bcrypt = require("bcryptjs");
 const db = require("../models");
+const axios = require("axios")
 
 
 // GET Profiles Page
-router.get('/drink', (req, res) => {
+router.get('/profile', async (req, res) => {
 	// check if user is authorized
 	if (!res.locals.user) {
 		// if the user is not authorized, ask them to log in
-		res.render('users/login', { msg: 'please log in to continue' })
+		res.render('users/login.ejs', { msg: 'please log in to continue' })
 		return // end the route here
 	}
   const user = res.locals.user;
-	res.render('users/profile', { user })
-})
+  es.render('users/profile', {user: res.locals.user, drink: drinks})
+	})
+
+// API request
+	router.get('/drink', (req, res) => {
+		let drinksUrl = 'http://www.thecocktaildb.com/api/json/v1/1/random.php';
+		  axios.get(drinksUrl).then(apiResponse => {
+		  let drink = apiResponse.data.results;
+		  res.render('drink/results.ejs', { drink: apiResponse.data.drinks })
+		})
+		.catch(err) 
+		console.log(err)
+
+	})
+
 
 // GET // Create Edit page
 router.get("/edit", (req, res) => {
@@ -64,5 +78,4 @@ router.get("/edit", (req, res) => {
   });
   
 
-
-module.exports = router;
+module.exports = router

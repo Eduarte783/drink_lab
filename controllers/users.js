@@ -4,6 +4,7 @@ const db = require('../models')
 const cryptoJS = require('crypto-js')
 const bcrypt = require('bcryptjs')
 const cookieParser = require('cookie-parser')
+const axios = require("axios")
 
 // GET /users/new -- renders a form to create a new user
 router.get('/new', (req, res) => {
@@ -31,7 +32,7 @@ router.post('/', async (req, res) => {
 			process.env.ENC_KEY).toString()
 			res.cookie('userId', encryptedId)
 			// redirect to the homepage (in the future this could redirect elsewhere)
-			res.redirect('/drink/results')
+			res.redirect('/drink/')
 		} else {
 		// if the user was not created
 			// re render the login form with a message for the user
@@ -71,7 +72,7 @@ router.post('/login', async (req, res) => {
 			const encryptedId = cryptoJS.AES.encrypt(foundUser.id.toString(), process.env.ENC_KEY).toString()
 			res.cookie('userId', encryptedId)
 			// redirect to profile
-			res.redirect('/drink/results') 
+			res.redirect('/drink/profile') 
 		} else {
 			// if not -- render the login form with a message
 			res.render('users/login.ejs', { msg: 'are you sure you have an account' })
@@ -90,15 +91,5 @@ router.get('/logout', (req, res) => {
 	res.redirect('/');
 })
 
-router.get('/drink', (req, res) => {
-	let drinksUrl = 'http://www.thecocktaildb.com/api/json/v1/1/random.php';
-	  axios.get(drinksUrl).then(apiResponse => {
-	  let drink = apiResponse.data.results;
-	  res.render('drink/results.ejs', { drink: apiResponse.data.drinks })
-	})
-	.catch(err) 
-	console.log(err)
-	
-  });
 
 module.exports = router

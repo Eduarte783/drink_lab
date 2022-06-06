@@ -10,8 +10,9 @@ const { user } = require("pg/lib/defaults");
 
 // GET /drinks - return a page with favorited drinks
 router.get('/favorites', async (req, res) => {
+	const user = res.locals.user
 	const allFaves = await db.drinks.findAll()
-	//where: { userId: user.id}
+	where: { userId: user.id}
 	// TODO: Get all records from the DB and render to view
 	res.render('faves/favorites.ejs', {allFaves}) 
   });
